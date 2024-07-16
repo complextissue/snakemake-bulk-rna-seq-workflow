@@ -1,0 +1,59 @@
+samples: "config/samples.tsv"
+
+# general settings
+experiment:
+  species: "mouse" # "human"
+  untreated_name: "untreated"
+  treated_name: "treated"
+
+check_quality:
+  run: True
+  threads: 5
+  memory_limit_mb: 4096 # FastQC requires this to be at least 100 MB
+
+get_reference:
+  run: True
+  species: "mus_musculus" # "homo_sapiens"
+  build: "GRCm39" # "GRCh38"
+  release: "112" # "112"
+
+build_index:
+  run: True
+  threads: 5
+
+quantify_reads:
+  run: True
+  threads: 15
+  libtype: "A"
+  extra: "--numBootstraps 32 --gcBias"
+
+summarize_reads:
+  run: True
+  threads: 1
+  return_transcripts: False
+  counts_from_abundance: "length_scaled_tpm"
+
+  # only set this to True if you also want to generate the counts using the R version of tximport
+  run_tximport: True
+  counts_from_abundance_tximport: "lengthScaledTPM"
+
+perform_dge_analysis:
+  run: True
+  threads: 8
+  min_mean_counts: 20 # the minimum mean count across all samples
+  min_max_counts: 50 # the minimum count that at least one sample needs to have
+  min_sample_counts: # the minimum count min_counts that at least min_samples have to have
+    min_counts: 20
+    min_samples: 2
+  refit_cooks: True
+  shrink_log2_fold_change: False
+
+perform_gse_analysis:
+  run: True
+  significance_threshold: 0.01 # 0.05
+  top_genes: 100 # how many genes to annotate in the volcano plot
+  top_transcription_factors: 20 # how many transcription factors to show in the plot
+  pathway_overlap_count: 5 # how many genes of the pathway gene set have to be present in the DGE results
+  top_pathways: 20 # how many pathways to show in the plot
+  msigdb_geneset: "kegg_pathways" # "go_biological_process" # "reactome_pathways" # "kegg_pathways"
+  top_genesets: 15 # how many genesets to show in the plot

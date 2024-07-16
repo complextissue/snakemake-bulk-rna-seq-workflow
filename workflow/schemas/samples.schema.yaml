@@ -1,0 +1,16 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+description: |
+  Schema for sample metadata
+
+properties:
+  sample_id:
+    type: string
+    description: Unique identifier for the sample
+  condition:
+    type: string
+    description: Condition of the sample
+
+required:
+  - sample_id
+  - condition

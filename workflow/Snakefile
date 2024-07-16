@@ -1,0 +1,25 @@
+from snakemake.utils import min_version
+
+min_version("8.12.0")
+
+
+configfile: "config/config.yaml"
+
+
+report: "report/workflow.rst"
+
+
+include: "rules/common.smk"
+include: "rules/check_quality.smk"
+include: "rules/get_reference.smk"
+include: "rules/build_index.smk"
+include: "rules/quantify_reads.smk"
+include: "rules/summarize_reads.smk"
+include: "rules/summarize_reads_tximport.smk"
+include: "rules/perform_dge_analysis.smk"
+include: "rules/perform_gse_analysis.smk"
+
+
+rule all:
+    input:
+        all_input,

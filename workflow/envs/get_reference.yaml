@@ -1,0 +1,6 @@
+channels:
+  - defaults
+dependencies:
+  - pip:
+    - git+https://github.com/complextissue/pytximport.git@dev
+    # - pytximport == 0.6.0

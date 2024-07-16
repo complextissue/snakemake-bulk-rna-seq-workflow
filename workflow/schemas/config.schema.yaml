@@ -1,0 +1,124 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+description: |
+  Schema for the config file
+
+type: object
+
+properties:
+  samples:
+    type: string
+
+  experiment:
+    type: object
+    properties:
+      species:
+        type: string
+      untreated_name:
+        type: string
+      treated_name:
+        type: string
+
+  check_quality:
+    type: object
+    properties:
+      run:
+        type: boolean
+      threads:
+        type: integer
+      memory_limit_mb:
+        type: integer
+
+  get_reference:
+    type: object
+    properties:
+      run:
+        type: boolean
+      species:
+        type: string
+      build:
+        type: string
+      release:
+        type: string
+
+  build_index:
+    type: object
+    properties:
+      run:
+        type: boolean
+      threads:
+        type: integer
+
+  quantify_reads:
+    type: object
+    properties:
+      run:
+        type: boolean
+      threads:
+        type: integer
+      libtype:
+        type: string
+      extra:
+        type: string
+
+  summarize_reads:
+    type: object
+    properties:
+      run:
+        type: boolean
+      threads:
+        type: integer
+      return_transcripts:
+        type: boolean
+      counts_from_abundance:
+        type: string
+      run_tximport:
+        type: boolean
+      counts_from_abundance_tximport:
+        type: string
+
+  perform_dge_analysis:
+    type: object
+    properties:
+      run:
+        type: boolean
+      threads:
+        type: integer
+      min_mean_counts:
+        type: integer
+      min_max_counts:
+        type: integer
+      min_sample_counts:
+        type: object
+        properties:
+          min_counts:
+            type: integer
+          min_samples:
+            type: integer
+      refit_cooks:
+        type: boolean
+      shrink_log2_fold_change:
+        type: boolean
+
+  perform_gse_analysis:
+    type: object
+    properties:
+      run:
+        type: boolean
+      significance_threshold:
+        type: number
+      top_genes:
+        type: integer
+      top_transcription_factors:
+        type: integer
+      pathway_overlap_count:
+        type: integer
+      top_pathways:
+        type: integer
+      msigdb_geneset:
+        type: string
+      top_genesets:
+        type: integer
+
+required:
+  - samples

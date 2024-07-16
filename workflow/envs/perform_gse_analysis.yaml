@@ -1,0 +1,12 @@
+channels:
+  - conda-forge
+dependencies:
+  - conda-forge::decoupler-py = 1.7.0
+  - conda-forge::omnipath = 1.0.8
+  - numpy = 1.23.5
+  - matplotlib = 3.9.1
+  - seaborn = 0.13.2
+  - pandas = 2.2.2
+  - pip = 24.0.0
+  - pip:
+    - pypath-omnipath == 0.16.16

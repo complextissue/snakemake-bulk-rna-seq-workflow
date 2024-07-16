@@ -1,0 +1,9 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - anndata = 0.10.8
+  - matplotlib = 3.9.1
+  - pandas = 2.2.2
+  - pydeseq2 = 0.4.10
+  - seaborn = 0.13.2

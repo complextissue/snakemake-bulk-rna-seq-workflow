@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+dependencies:
+  - numpy = 2.0.0
+  - pip = 24.0.0
+  - pip:
+    - git+https://github.com/complextissue/pytximport.git@dev
+    # - pytximport == 0.6.0
