@@ -72,10 +72,6 @@ properties:
         type: boolean
       counts_from_abundance:
         type: string
-      run_tximport:
-        type: boolean
-      counts_from_abundance_tximport:
-        type: string
 
   perform_dge_analysis:
     type: object
@@ -106,6 +102,8 @@ properties:
       run:
         type: boolean
       significance_threshold:
+        type: number
+      log2_fold_change_threshold:
         type: number
       top_genes:
         type: integer

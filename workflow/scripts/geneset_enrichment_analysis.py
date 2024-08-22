@@ -1,6 +1,7 @@
 """Perform gene set enrichment analysis on the results of a differential expression analysis using decoupler-py."""
 
 from logging import warning
+from pathlib import Path
 
 import decoupler as dc
 import numpy as np
@@ -28,18 +29,21 @@ fig = dc.plot_volcano_df(
     x="log2FoldChange",
     y="padj",
     sign_thr=snakemake.params["significance_threshold"],
+    lFCs_thr=snakemake.params["log2_fold_change_threshold"],
     top=snakemake.params["top_genes"],
-    figsize=(15, 7.5),
+    figsize=(10, 7.5),
     return_fig=True,
 )
 count_up = np.sum(
-    (df_results["log2FoldChange"] > 0.5) & (df_results["padj"] < snakemake.params["significance_threshold"])
+    (df_results["log2FoldChange"] > snakemake.params["log2_fold_change_threshold"])
+    & (df_results["padj"] < snakemake.params["significance_threshold"])
 )
 count_down = np.sum(
-    (df_results["log2FoldChange"] < -0.5) & (df_results["padj"] < snakemake.params["significance_threshold"])
+    (df_results["log2FoldChange"] < -snakemake.params["log2_fold_change_threshold"])
+    & (df_results["padj"] < snakemake.params["significance_threshold"])
 )
 fig.suptitle(f"Differentially expressed genes ({count_up} up, {count_down} down)", fontsize=12)
-fig.savefig(snakemake.output["volcano_plot"])
+fig.savefig(snakemake.output["volcano_plot"], dpi=500)
 
 # perform transcription factor enrichment analysis
 collectri = dc.get_collectri(
@@ -68,8 +72,38 @@ fig = dc.plot_barplot(
     return_fig=True,
 )
 fig.tight_layout(pad=1)
-fig.savefig(snakemake.output["transcription_factors_barplot"])
+transcription_factors_barplot_path = Path(snakemake.output["transcription_factors_barplot"])
+fig.savefig(transcription_factors_barplot_path, dpi=500)
 tf_acts.to_csv(snakemake.output["transcription_factors_table"])
+
+# plot the log2 fold change of the target genes of the top transcription factors by their absolute log2 fold change
+tf_acts = tf_acts.T
+tf_acts["activity_absolute"] = np.abs(tf_acts[treated_vs_untreated_identifier])
+top_tfs = (
+    tf_acts.sort_values("activity_absolute", ascending=False).head(snakemake.params["top_transcription_factors"]).index
+)
+
+# Extract logFCs and pvals
+log2_fold_changes = df_results[["log2FoldChange"]].T.rename(index={"log2FoldChange": treated_vs_untreated_identifier})
+p_values_adjusted = df_results[["padj"]].T.rename(index={"padj": treated_vs_untreated_identifier})
+
+for top_tf in top_tfs:
+    fig = dc.plot_volcano(
+        log2_fold_changes,
+        p_values_adjusted,
+        treated_vs_untreated_identifier,
+        name=top_tf,
+        net=collectri,
+        top=30,
+        sign_thr=snakemake.params["significance_threshold"],
+        lFCs_thr=snakemake.params["log2_fold_change_threshold"],
+        figsize=(10, 7.5),
+        return_fig=True,
+    )
+    fig.suptitle(f"Target genes of {top_tf}", fontsize=12)
+    fig.savefig(
+        transcription_factors_barplot_path.parent / f"{top_tf}{transcription_factors_barplot_path.suffix}", dpi=500
+    )
 
 # perform pathway enrichment analysis
 progeny = dc.get_progeny(
@@ -90,7 +124,7 @@ fig = dc.plot_barplot(
     return_fig=True,
 )
 fig.tight_layout(pad=1)
-fig.savefig(snakemake.output["pathways_barplot"])
+fig.savefig(snakemake.output["pathways_barplot"], dpi=500)
 pathway_acts.to_csv(snakemake.output["pathways_table"])
 
 # perform geneset enrichment analysis on the Reactome resource
@@ -131,5 +165,5 @@ fig = dc.plot_dotplot(
     return_fig=True,
 )
 fig.tight_layout(pad=1)
-fig.savefig(snakemake.output["geneset_dotplot"])
+fig.savefig(snakemake.output["geneset_dotplot"], dpi=500)
 enriched_genesets.to_csv(snakemake.output["geneset_table"])

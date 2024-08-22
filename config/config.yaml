@@ -25,17 +25,13 @@ quantify_reads:
   run: True
   threads: 15
   libtype: "A"
-  extra: "--numBootstraps 32 --gcBias"
+  extra: "--numBootstraps 48 --gcBias"
 
 summarize_reads:
   run: True
   threads: 1
   return_transcripts: False
-  counts_from_abundance: "length_scaled_tpm"
-
-  # only set this to True if you also want to generate the counts using the R version of tximport
-  run_tximport: True
-  counts_from_abundance_tximport: "lengthScaledTPM"
+  counts_from_abundance: "length_scaled_tpm" # Null # "scaled_tpm" # "length_scaled_tpm" # "dtu_scaled_tpm"
 
 perform_dge_analysis:
   run: True
@@ -51,6 +47,7 @@ perform_dge_analysis:
 perform_gse_analysis:
   run: True
   significance_threshold: 0.01 # 0.05
+  log2_fold_change_threshold: 0.5
   top_genes: 100 # how many genes to annotate in the volcano plot
   top_transcription_factors: 20 # how many transcription factors to show in the plot
   pathway_overlap_count: 5 # how many genes of the pathway gene set have to be present in the DGE results

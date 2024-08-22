@@ -92,20 +92,13 @@ def all_input(wildcards):
             ],
         )
 
-    if config["summarize_reads"]["run_tximport"]:
-        wanted_input.extend(
-            [
-                "results/tables/summarize_reads_tximport/counts.csv",
-                "results/tables/perform_dge_analysis/pydeseq2_tximport.csv",
-                "results/plots/perform_dge_analysis/pca_plot_tximport.svg",
-            ],
-        )
-
     if config["perform_dge_analysis"]["run"]:
         wanted_input.extend(
             [
                 "results/tables/perform_dge_analysis/pydeseq2.csv",
                 "results/plots/perform_dge_analysis/pca_plot.svg",
+                "results/plots/perform_dge_analysis/pvalue_histogram.svg",
+                "results/plots/perform_dge_analysis/ma_plot.svg",
             ],
         )
 

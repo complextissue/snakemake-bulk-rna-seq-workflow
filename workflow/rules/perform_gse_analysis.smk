@@ -14,6 +14,7 @@ rule run_decoupler:
         treated_name=config["experiment"]["treated_name"],
         untreated_name=config["experiment"]["untreated_name"],
         significance_threshold=config["perform_gse_analysis"]["significance_threshold"],
+        log2_fold_change_threshold=config["perform_gse_analysis"]["log2_fold_change_threshold"],
         top_genes=config["perform_gse_analysis"]["top_genes"],
         top_transcription_factors=config["perform_gse_analysis"]["top_transcription_factors"],
         pathway_overlap_count=config["perform_gse_analysis"]["pathway_overlap_count"],

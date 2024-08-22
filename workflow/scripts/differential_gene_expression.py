@@ -83,6 +83,7 @@ results = DeseqStats(
         snakemake.params["treated_name"],
         snakemake.params["untreated_name"],
     ),
+    quiet=True,
 )
 
 results.summary()
@@ -100,7 +101,21 @@ if "gene_name" in df_transcript_to_gene.columns:
     gene_id_to_gene_name = df_transcript_to_gene.set_index("gene_id")["gene_name"].drop_duplicates().to_dict()
     df_results["gene_name"] = df_results.index.to_series().map(gene_id_to_gene_name).values
 
+# plot a histogram of p-values
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5), dpi=200)
+sns.histplot(df_results["pvalue"], ax=ax1, bins=20)
+ax1.set_title("Histogram of p-values")
+sns.histplot(df_results["padj"], ax=ax2, bins=20)
+ax2.set_title("Histogram of adjusted p-values")
+fig.tight_layout(pad=5)
+fig.savefig(snakemake.output["pvalue_histogram"])
+
 df_results.to_csv(
     snakemake.output["results_table"],
     index=True,
+)
+
+results.plot_MA(
+    log=True,
+    save_path=snakemake.output["ma_plot"],
 )
