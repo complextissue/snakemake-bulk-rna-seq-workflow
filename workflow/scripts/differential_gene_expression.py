@@ -97,6 +97,7 @@ df_transcript_to_gene = pd.read_table(
     header=0,
 )
 
+# if the transcript to gene map contains a gene name column, replace gene ids with gene names
 if "gene_name" in df_transcript_to_gene.columns:
     gene_id_to_gene_name = df_transcript_to_gene.set_index("gene_id")["gene_name"].drop_duplicates().to_dict()
     df_results["gene_name"] = df_results.index.to_series().map(gene_id_to_gene_name).values

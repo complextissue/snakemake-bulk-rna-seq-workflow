@@ -34,10 +34,10 @@ def all_input(wildcards):
             expand(
                 [
                     "resources/reads/{sample_id}_{read}.fastq.gz",
-                    "results/plots/check_quality/run_fastqc/{sample_id}_{read}.html",
-                    "results/plots/check_quality/run_fastqc/{sample_id}_{read}_fastqc.zip",
-                    "results/logs/check_quality/run_fastqc/{sample_id}_{read}.log",
-                    "results/plots/check_quality/multiqc/report.html",
+                    # "results/plots/check_quality/run_fastqc/{sample_id}_{read}.html",
+                    # "results/plots/check_quality/run_fastqc/{sample_id}_{read}_fastqc.zip",
+                    # "results/logs/check_quality/run_fastqc/{sample_id}_{read}.log",
+                    "results/plots/check_quality/run_multiqc/report.html",
                     "results/plots/check_quality/run_fastp/{sample_id}.html",
                 ],
                 sample_id=samples.index,
@@ -55,24 +55,50 @@ def all_input(wildcards):
             ]
         )
 
-    if config["build_index"]["run"]:
+    if config["build_index_salmon"]["run"]:
         wanted_input.extend(
             [
                 "resources/reference/gentrome.fasta",
                 "resources/reference/decoys.txt",
                 "resources/reference/transcriptome_index/info.json",
-                "results/logs/build_index/create_salmon_decoys.log",
-                "results/logs/build_index/create_salmon_index.log",
+                "results/logs/build_index/create_decoys_salmon.log",
+                "results/logs/build_index/create_index_salmon.log",
             ]
         )
 
-    if config["quantify_reads"]["run"]:
+    if config["build_index_kallisto"]["run"]:
+        wanted_input.extend(
+            [
+                "resources/reference/kallisto/transcriptome.idx",
+                "results/logs/build_index/create_index_kallisto.log",
+            ]
+        )
+
+    if config["build_index_rsem"]["run"]:
+        wanted_input.extend(
+            [
+                "resources/reference/rsem/reference.seq",
+                "results/logs/build_index/create_index_rsem.log",
+                *multiext(
+                    "resources/reference/bowtie/genome",
+                    ".1.bt2",
+                    ".2.bt2",
+                    ".3.bt2",
+                    ".4.bt2",
+                    ".rev.1.bt2",
+                    ".rev.2.bt2",
+                ),
+                "results/logs/build_index/create_index_bowtie.log",
+            ]
+        )
+
+    if config["quantify_reads_salmon"]["run"]:
         wanted_input.extend(
             expand(
                 [
-                    "resources/reads/quantified/{sample_id}/quant.sf",
-                    "resources/reads/quantified/{sample_id}/lib_format_counts.json",
-                    "results/logs/quantify_reads/{sample_id}.log",
+                    "resources/reads/quantified_salmon/{sample_id}/quant.sf",
+                    "resources/reads/quantified_salmon/{sample_id}/lib_format_counts.json",
+                    "results/logs/quantify_reads_salmon/{sample_id}.log",
                 ],
                 sample_id=samples.index,
             )
@@ -85,10 +111,43 @@ def all_input(wildcards):
                 ],
             )
 
+    if config["quantify_reads_kallisto"]["run"]:
+        wanted_input.extend(
+            expand(
+                [
+                    "resources/reads/quantified_kallisto/{sample_id}/",
+                    # "resources/reads/quantified_kallisto/{sample_id}/abundance.h5",
+                    # "resources/reads/quantified_kallisto/{sample_id}/run_info.json",
+                    "results/logs/quantify_reads_kallisto/{sample_id}.log",
+                ],
+                sample_id=samples.index,
+            )
+        )
+
+    if config["quantify_reads_rsem"]["run"]:
+        wanted_input.extend(
+            expand(
+                [
+                    "resources/reads/quantified_rsem/{sample_id}.genes.results",
+                    "resources/reads/quantified_rsem/{sample_id}.isoforms.results",
+                    "results/logs/quantify_reads_rsem/{sample_id}.log",
+                ],
+                sample_id=samples.index,
+            )
+        )
+
     if config["summarize_reads"]["run"]:
         wanted_input.extend(
             [
-                "resources/reads/summarized/counts.h5ad",
+                f"resources/reads/summarized_pytximport/counts_{config['summarize_reads']['counts_from_abundance']}.h5ad",
+                f"resources/reads/summarized_pytximport/counts_{config['summarize_reads']['counts_from_abundance']}.csv",
+            ],
+        )
+
+    if config["summarize_reads_tximport"]["run"]:
+        wanted_input.extend(
+            [
+                f"resources/reads/summarized_tximport/counts_{config['summarize_reads_tximport']['counts_from_abundance']}.csv",
             ],
         )
 

@@ -1,4 +1,4 @@
-samples: "config/samples.tsv"
+samples: "config/samples_ntn.tsv"
 
 # general settings
 experiment:
@@ -17,24 +17,54 @@ get_reference:
   build: "GRCm39" # "GRCh38"
   release: "112" # "112"
 
-build_index:
+build_index_salmon:
   run: True
   threads: 5
 
-quantify_reads:
+build_index_kallisto:
   run: True
-  threads: 15
+  threads: 5
+
+build_index_rsem:
+  run: True
+  threads: 5
+
+build_index_bowtie:
+  run: True
+  threads: 5
+
+quantify_reads_salmon:
+  run: True
+  threads: 7
   libtype: "A"
   extra: "--numBootstraps 48 --gcBias"
 
+quantify_reads_kallisto:
+  run: True
+  threads: 7
+
+quantify_reads_bowtie:
+  run: True
+  threads: 7
+
+quantify_reads_rsem:
+  run: True
+  threads: 7
+
 summarize_reads:
   run: True
-  threads: 1
+  threads: 2
   return_transcripts: False
   counts_from_abundance: "length_scaled_tpm" # Null # "scaled_tpm" # "length_scaled_tpm" # "dtu_scaled_tpm"
 
-perform_dge_analysis:
+summarize_reads_tximport:
   run: True
+  threads: 2
+  return_transcripts: False
+  counts_from_abundance: "lengthScaledTPM" # Null # "scaledTPM" # "lengthScaledTPM" # "dtuScaledTPM"
+
+perform_dge_analysis:
+  run: False
   threads: 8
   min_mean_counts: 20 # the minimum mean count across all samples
   min_max_counts: 50 # the minimum count that at least one sample needs to have
@@ -45,7 +75,7 @@ perform_dge_analysis:
   shrink_log2_fold_change: False
 
 perform_gse_analysis:
-  run: True
+  run: False
   significance_threshold: 0.01 # 0.05
   log2_fold_change_threshold: 0.5
   top_genes: 100 # how many genes to annotate in the volcano plot

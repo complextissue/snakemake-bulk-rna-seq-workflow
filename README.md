@@ -1,13 +1,14 @@
 # Snakemake workflow: RNA sequencing with pytximport
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.0.0-brightgreen.svg)](https://snakemake.bitbucket.io)
+[![Zenodo repository](https://img.shields.io/badge/DOI-10.5281/zenodo.12713812-blue)](https://zenodo.org/records/12713812)
 
 End-to-end bulk RNA sequencing analysis from paired-end FASTQ files to differential gene expression and enrichment analyses, consisting of the following steps:
 
 1. Quality control
     - FastQC metrics of all read files
     - fastp trimming and quality control of read files
-     - MultiQC report of FastQC and fastp metrics
+    - MultiQC report of FastQC and fastp metrics
 2. Reference file preparation
     - Download of a FASTA genome from Ensembl
     - Download of a FASTA transcriptome from Ensembl
@@ -29,7 +30,11 @@ This workflow is based on the Snakemake cookiecutter template, the kallisto-sleu
 
 ## Usage
 
-If you use this workflow in a paper, don't forget to give credits to the authors by citing the URL of this repository and, if available, its DOI.
+If you use this workflow in a paper, we kindly ask you to give credits:
+- Kuehl, M. B. (2024). Snakemake workflow: RNA sequencing with pytximport (Initial). Zenodo. https://doi.org/10.5281/zenodo.12713812
+- Kuehl, M. (2024). pytximport: Gene count estimation from transcript quantification files in Python (0.6.0). Zenodo. https://doi.org/10.5281/zenodo.12713587
+
+Please also consider citing Snakemake and the tools contained in this pipeline.
 
 ### Step 1: Obtain a copy of this workflow
 
@@ -71,24 +76,16 @@ or
     snakemake --use-conda --drmaa --jobs 100
 
 in combination with any of the modes above.
-See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/executable.html) for further details.
+See the [Snakemake documentation](https://snakemake.readthedocs.io/en/stable/) for further details.
 
-### Step 5: Investigate results
-
-After successful execution, you can create a self-contained interactive HTML report with all results via:
-
-    snakemake --report report.html
-
-This report can, e.g., be forwarded to your collaborators.
-
-### Step 6: Commit changes
+### Step 5: Commit changes
 
 Whenever you change something, don't forget to commit the changes back to your github copy of the repository:
 
     git commit -a
     git push
 
-### Step 7: Obtain updates from upstream
+### Step 6: Obtain updates from upstream
 
 Whenever you want to synchronize your workflow copy with new developments from upstream, do the following.
 
@@ -100,7 +97,7 @@ Whenever you want to synchronize your workflow copy with new developments from u
 6. Carefully check whether you need to update the config files: `git diff HEAD upstream/master config`. If so, do it manually, and only where necessary, since you would otherwise likely overwrite your settings and samples.
 
 
-### Step 8: Contribute back
+### Step 7: Contribute back
 
 In case you have also changed or added steps, please consider contributing them back to the original repository:
 

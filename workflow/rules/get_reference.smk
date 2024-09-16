@@ -10,7 +10,7 @@ rule get_transcriptome:
         "results/logs/get_reference/get_transcriptome.log",
     cache: "omit-software"
     wrapper:
-        "v3.13.6/bio/reference/ensembl-sequence"
+        "v4.3.0/bio/reference/ensembl-sequence"
 
 
 rule get_genome:
@@ -25,7 +25,7 @@ rule get_genome:
         "results/logs/get_reference/get_genome.log",
     cache: "omit-software"
     wrapper:
-        "v3.13.6/bio/reference/ensembl-sequence"
+        "v4.3.0/bio/reference/ensembl-sequence"
 
 
 rule get_annotation:
@@ -39,7 +39,7 @@ rule get_annotation:
         "results/logs/get_reference/get_annotation.log",
     cache: "omit-software"
     wrapper:
-        "v3.13.6/bio/reference/ensembl-annotation"
+        "v4.3.0/bio/reference/ensembl-annotation"
 
 
 rule create_transcript_to_gene_map:

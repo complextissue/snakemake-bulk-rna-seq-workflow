@@ -1,4 +1,4 @@
-rule quantify_reads:
+rule quantify_reads_salmon:
     input:
         r1="resources/reads/trimmed/{sample_id}_1.fastq.gz",
         r2="resources/reads/trimmed/{sample_id}_2.fastq.gz",
@@ -21,13 +21,72 @@ rule quantify_reads:
             "versionInfo.json",
         ),
     output:
-        quant="resources/reads/quantified/{sample_id}/quant.sf",
-        lib="resources/reads/quantified/{sample_id}/lib_format_counts.json",
+        quant="resources/reads/quantified_salmon/{sample_id}/quant.sf",
+        lib="resources/reads/quantified_salmon/{sample_id}/lib_format_counts.json",
+        info="resources/reads/quantified_salmon/{sample_id}/aux_info/meta_info.json",
+        flenDist="resources/reads/quantified_salmon/{sample_id}/libParams/flenDist.txt",
     log:
-        "results/logs/quantify_reads/{sample_id}.log",
+        "results/logs/quantify_reads_salmon/{sample_id}.log",
     params:
-        libtype=config["quantify_reads"]["libtype"],
-        extra=config["quantify_reads"]["extra"],
-    threads: config["quantify_reads"]["threads"]
+        libtype=config["quantify_reads_salmon"]["libtype"],
+        extra=config["quantify_reads_salmon"]["extra"],
+    threads: config["quantify_reads_salmon"]["threads"]
     wrapper:
-        "v3.13.6/bio/salmon/quant"
+        "v4.3.0/bio/salmon/quant"
+
+
+rule quantify_reads_bowtie:
+    input:
+        sample=["resources/reads/trimmed/{sample_id}_1.fastq.gz", "resources/reads/trimmed/{sample_id}_2.fastq.gz"],
+        idx=multiext(
+            "resources/reference/bowtie/genome",
+            ".1.bt2",
+            ".2.bt2",
+            ".3.bt2",
+            ".4.bt2",
+            ".rev.1.bt2",
+            ".rev.2.bt2",
+        ),
+    output:
+        "resources/reads/quantified_bowtie/{sample_id}.bam",
+    log:
+        "results/logs/quantify_reads_bowtie/{sample_id}.log",
+    params:
+        extra="",
+    threads: config["quantify_reads_bowtie"]["threads"]
+    wrapper:
+        "v4.3.0/bio/bowtie2/align"
+
+
+rule quantify_reads_rsem:
+    input:
+        bam="resources/reads/quantified_bowtie/{sample_id}.bam",
+        reference=multiext(
+            "resources/reference/rsem/reference", ".grp", ".ti", ".transcripts.fa", ".seq", ".idx.fa", ".n2g.idx.fa"
+        ),
+    output:
+        genes_results="resources/reads/quantified_rsem/{sample_id}.genes.results",
+        isoforms_results="resources/reads/quantified_rsem/{sample_id}.isoforms.results",
+    log:
+        "results/logs/quantify_reads_rsem/{sample_id}.log",
+    params:
+        paired_end=True,
+        extra="--seed 42",
+    threads: config["quantify_reads_rsem"]["threads"]
+    wrapper:
+        "v4.3.0/bio/rsem/calculate-expression"
+
+
+rule quantify_reads_kallisto:
+    input:
+        fastq=["resources/reads/trimmed/{sample_id}_1.fastq.gz", "resources/reads/trimmed/{sample_id}_2.fastq.gz"],
+        index="resources/reference/kallisto/transcriptome.idx",
+    output:
+        directory("resources/reads/quantified_kallisto/{sample_id}"),
+    params:
+        extra="",
+    log:
+        "results/logs/quantify_reads_kallisto/{sample_id}.log",
+    threads: config["quantify_reads_kallisto"]["threads"]
+    wrapper:
+        "v4.3.0/bio/kallisto/quant"

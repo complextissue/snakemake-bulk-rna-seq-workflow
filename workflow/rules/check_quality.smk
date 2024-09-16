@@ -12,7 +12,7 @@ rule run_fastqc:
     resources:
         mem_mb=config["check_quality"]["memory_limit_mb"],
     wrapper:
-        "v3.13.6/bio/fastqc"
+        "v4.3.0/bio/fastqc"
 
 
 rule run_fastp:
@@ -29,17 +29,17 @@ rule run_fastp:
         extra="",
     threads: config["check_quality"]["threads"]
     wrapper:
-        "v3.13.6/bio/fastp"
+        "v4.3.0/bio/fastp"
 
 
 rule run_multiqc:
     input:
+        # *expand(
+        #     "results/plots/check_quality/run_fastqc/{sample_id}_{read}_fastqc.zip",
+        #     sample_id=samples.index,
+        #     read=reads,
+        # ),
         [
-            *expand(
-                "results/plots/check_quality/run_fastqc/{sample_id}_{read}_fastqc.zip",
-                sample_id=samples.index,
-                read=reads,
-            ),
             *expand(
                 "results/plots/check_quality/run_fastp/{sample_id}.json",
                 sample_id=samples.index,
@@ -53,31 +53,31 @@ rule run_multiqc:
         extra="",
         use_input_files_only=True,
     wrapper:
-        "v3.13.6/bio/multiqc"
+        "v4.3.0/bio/multiqc"
 
 
 rule run_multiqc_after_salmon:
     input:
+        # *expand(
+        #     "results/plots/check_quality/run_fastqc/{sample_id}_{read}_fastqc.zip",
+        #     sample_id=samples.index,
+        #     read=reads,
+        # ),
         [
-            *expand(
-                "results/plots/check_quality/run_fastqc/{sample_id}_{read}_fastqc.zip",
-                sample_id=samples.index,
-                read=reads,
-            ),
             *expand(
                 "results/plots/check_quality/run_fastp/{sample_id}.json",
                 sample_id=samples.index,
             ),
             *expand(
-                "resources/reads/quantified/{sample_id}/lib_format_counts.json",
+                "resources/reads/quantified_salmon/{sample_id}/lib_format_counts.json",
                 sample_id=samples.index,
             ),
             *expand(
-                "resources/reads/quantified/{sample_id}/aux_info/meta_info.json",
+                "resources/reads/quantified_salmon/{sample_id}/aux_info/meta_info.json",
                 sample_id=samples.index,
             ),
             *expand(
-                "resources/reads/quantified/{sample_id}/libParams/flenDist.txt",
+                "resources/reads/quantified_salmon/{sample_id}/libParams/flenDist.txt",
                 sample_id=samples.index,
             ),
         ],
@@ -89,4 +89,4 @@ rule run_multiqc_after_salmon:
         extra="",
         use_input_files_only=True,
     wrapper:
-        "v3.13.6/bio/multiqc"
+        "v4.3.0/bio/multiqc"

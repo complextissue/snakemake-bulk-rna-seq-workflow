@@ -4,4 +4,4 @@ channels:
 dependencies:
   - conda-forge::numpy = 2.0.0
   - conda-forge::pip = 24.0.0
-  - bioconda::pytximport = 0.7.0
+  - bioconda::pytximport = 0.8.0
