@@ -11,10 +11,16 @@ files <- sapply(
     snakemake@input[["files"]],
     function(file) as.character(file)
 )
+
+tx_out <- snakemake@params[["counts_from_abundance"]] %in% c(
+    "scaledTPM",
+    "dtuScaledTPM"
+)
+
 txi <- tximport(
     files,
     type = "salmon",
-    txOut = snakemake@params[["return_transcripts"]],
+    txOut = tx_out,
     tx2gene = tx2gene,
     countsFromAbundance = snakemake@params[["counts_from_abundance"]],
     dropInfReps = FALSE,

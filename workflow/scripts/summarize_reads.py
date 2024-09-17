@@ -19,8 +19,8 @@ config = {
     "file_paths": snakemake.input["files"],
     "transcript_gene_map": snakemake.input["transcript_to_gene_map"],
     "save_path": snakemake.output[0],
-    "return_transcript_data": snakemake.params["return_transcripts"],
-    "counts_from_abundance": snakemake.params["counts_from_abundance"],
+    "return_transcript_data": snakemake.params["counts_from_abundance"] not in ["None", "length_scaled_tpm"],
+    "counts_from_abundance": None if snakemake.params["counts_from_abundance"] == "None" else snakemake.params["counts_from_abundance"],
     "output_format": output_format,
 }
 

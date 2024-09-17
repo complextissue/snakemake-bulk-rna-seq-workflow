@@ -26,12 +26,17 @@ build_index_kallisto:
   threads: 5
 
 build_index_rsem:
-  run: True
+  run: False
   threads: 5
 
 build_index_bowtie:
   run: True
   threads: 5
+
+build_index_star:
+  run: True
+  threads: 5
+  sjdb_overhang: 149
 
 quantify_reads_salmon:
   run: True
@@ -48,20 +53,20 @@ quantify_reads_bowtie:
   threads: 7
 
 quantify_reads_rsem:
+  run: False
+  threads: 7
+
+quantify_reads_star:
   run: True
   threads: 7
 
 summarize_reads:
   run: True
   threads: 2
-  return_transcripts: False
-  counts_from_abundance: "length_scaled_tpm" # Null # "scaled_tpm" # "length_scaled_tpm" # "dtu_scaled_tpm"
 
 summarize_reads_tximport:
   run: True
   threads: 2
-  return_transcripts: False
-  counts_from_abundance: "lengthScaledTPM" # Null # "scaledTPM" # "lengthScaledTPM" # "dtuScaledTPM"
 
 perform_dge_analysis:
   run: False

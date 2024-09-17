@@ -77,6 +77,51 @@ rule quantify_reads_rsem:
         "v4.3.0/bio/rsem/calculate-expression"
 
 
+rule quantify_reads_star:
+    input:
+        fq1="resources/reads/{accession}_1.fastq.gz",
+        fq2="resources/reads/{accession}_2.fastq.gz",
+        idx="resources/reference/star/index/",
+    output:
+        output_path="resources/reads/quantified_star/{accession}/",
+        aln="resources/reads/quantified_star/{accession}/aligned.bam",
+        aln_transcriptome="resources/reads/quantified_star/{accession}/Aligned.toTranscriptome.out.bam",
+    log:
+        "results/logs/quantify_reads_star/{accession}.log",
+    params:
+        extra=(
+            "--outSAMtype BAM Unsorted "
+            "--quantMode TranscriptomeSAM GeneCounts "
+            "--outFilterScoreMin 30 "
+            "--outFilterMultimapNmax 10 --winAnchorMultimapNmax 50 "
+            "--alignEndsType Local "
+        ),
+    threads: config["quantify_reads_star"]["threads"]
+    conda:
+        "../envs/quantify_reads_star.yaml"
+    script:
+        "../scripts/quantify_reads_star.py"
+
+
+rule quantify_reads_rsem_star:
+    input:
+        bam="resources/reads/quantified_star/{sample_id}/Aligned.toTranscriptome.out.bam",
+        reference=multiext(
+            "resources/reference/rsem/reference", ".grp", ".ti", ".transcripts.fa", ".seq", ".idx.fa", ".n2g.idx.fa"
+        ),
+    output:
+        genes_results="resources/reads/quantified_rsem_star/{sample_id}.genes.results",
+        isoforms_results="resources/reads/quantified_rsem_star/{sample_id}.isoforms.results",
+    log:
+        "results/logs/quantify_reads_rsem_star/{sample_id}.log",
+    params:
+        paired_end=True,
+        extra="--seed 42",
+    threads: config["quantify_reads_rsem"]["threads"]
+    wrapper:
+        "v4.3.0/bio/rsem/calculate-expression"
+
+
 rule quantify_reads_kallisto:
     input:
         fastq=["resources/reads/trimmed/{sample_id}_1.fastq.gz", "resources/reads/trimmed/{sample_id}_2.fastq.gz"],

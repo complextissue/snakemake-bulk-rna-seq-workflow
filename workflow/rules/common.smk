@@ -16,11 +16,17 @@ samples.index.names = ["sample_id"]
 validate(samples, schema="../schemas/samples.schema.yaml")
 
 reads = ["1", "2"]
+output_formats = ["h5ad", "csv"]
+counts_from_abundances_pytximport = ["None", "length_scaled_tpm", "scaled_tpm", "dtu_scaled_tpm"]
+counts_from_abundances_tximport = ["no", "lengthScaledTPM", "scaledTPM", "dtuScaledTPM"]
 
 
 wildcard_constraints:
     sample_id="|".join(samples.index),
     read="|".join(reads),
+    output_format="|".join(output_formats),
+    counts_from_abundance_pytximport="|".join(counts_from_abundances_pytximport),
+    counts_from_abundance_tximport="|".join(counts_from_abundances_tximport),
 
 
 def all_input(wildcards):
@@ -71,6 +77,13 @@ def all_input(wildcards):
             [
                 "resources/reference/kallisto/transcriptome.idx",
                 "results/logs/build_index/create_index_kallisto.log",
+            ]
+        )
+
+    if config["build_index_star"]["run"]:
+        wanted_input.extend(
+            [
+                directory("resources/reference/star/index/"),
             ]
         )
 
@@ -136,19 +149,36 @@ def all_input(wildcards):
             )
         )
 
+    if config["quantify_reads_star"]["run"]:
+        wanted_input.extend(
+            expand(
+                [
+                    "resources/reads/quantified_star/{sample_id}/Aligned.toTranscriptome.out.bam",
+                    "results/logs/quantify_reads_star/{sample_id}.log",
+                ],
+                sample_id=samples.index,
+            )
+        )
+
     if config["summarize_reads"]["run"]:
         wanted_input.extend(
-            [
-                f"resources/reads/summarized_pytximport/counts_{config['summarize_reads']['counts_from_abundance']}.h5ad",
-                f"resources/reads/summarized_pytximport/counts_{config['summarize_reads']['counts_from_abundance']}.csv",
-            ],
+            expand(
+                [
+                    "resources/reads/summarized_pytximport/counts_{counts_from_abundance_pytximport}.{output_format}",
+                ],
+                counts_from_abundance_pytximport=counts_from_abundances_pytximport,
+                output_format=output_formats,
+            )
         )
 
     if config["summarize_reads_tximport"]["run"]:
         wanted_input.extend(
-            [
-                f"resources/reads/summarized_tximport/counts_{config['summarize_reads_tximport']['counts_from_abundance']}.csv",
-            ],
+            expand(
+                [
+                    "resources/reads/summarized_tximport/counts_{counts_from_abundance_tximport}.csv",
+                ],
+                counts_from_abundance_tximport=counts_from_abundances_tximport,
+            )
         )
 
     if config["perform_dge_analysis"]["run"]:

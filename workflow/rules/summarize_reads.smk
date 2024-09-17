@@ -6,11 +6,9 @@ rule run_pytximport:
         ),
         transcript_to_gene_map="resources/reference/transcript_to_gene_map.tsv",
     output:
-        adata=f"resources/reads/summarized_pytximport/counts_{config['summarize_reads']['counts_from_abundance']}.h5ad",
-        counts=f"resources/reads/summarized_pytximport/counts_{config['summarize_reads']['counts_from_abundance']}.csv",
+        counts="resources/reads/summarized_pytximport/counts_{counts_from_abundance_pytximport}.{output_format}",
     params:
-        return_transcripts=config["summarize_reads"]["return_transcripts"],
-        counts_from_abundance=config["summarize_reads"]["counts_from_abundance"],
+        counts_from_abundance="{counts_from_abundance_pytximport}",
     conda:
         "../envs/summarize_reads.yaml"
     script:
@@ -25,10 +23,9 @@ rule run_tximport:
         ),
         transcript_to_gene_map="resources/reference/transcript_to_gene_map.tsv",
     output:
-        counts=f"resources/reads/summarized_tximport/counts_{config['summarize_reads_tximport']['counts_from_abundance']}.csv",
+        counts="resources/reads/summarized_tximport/counts_{counts_from_abundance_tximport}.csv",
     params:
-        counts_from_abundance=config["summarize_reads_tximport"]["counts_from_abundance"],
-        return_transcripts=config["summarize_reads_tximport"]["return_transcripts"],
+        counts_from_abundance="{counts_from_abundance_tximport}",
     conda:
         "../envs/summarize_reads_tximport.yaml"
     script:

@@ -47,6 +47,9 @@ rule create_transcript_to_gene_map:
         gtf="resources/reference/annotation.gtf",
     output:
         transcript_to_gene_map="resources/reference/transcript_to_gene_map.tsv",
+    params:
+        species=config["experiment"]["species"],
+        host="may2024.archive.ensembl.org",
     conda:
         "../envs/get_reference.yaml"
     script:

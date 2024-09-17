@@ -49,9 +49,11 @@ rule create_index_rsem:
         reference_genome="resources/reference/genome.fasta",
     output:
         seq="resources/reference/rsem/reference.seq",
-        other_files=multiext(
-            "resources/reference/rsem/reference", ".grp", ".ti", ".transcripts.fa", ".idx.fa", ".n2g.idx.fa"
-        ),
+        grp="resources/reference/rsem/reference.grp",
+        ti="resources/reference/rsem/reference.ti",
+        other_1="resources/reference/rsem/reference.transcripts.fa",
+        other_2="resources/reference/rsem/reference.idx.fa",
+        other_3="resources/reference/rsem/reference.n2g.idx.fa",
     params:
         extra="--gtf resources/reference/rsem/annotations.gtf",
     log:
@@ -81,6 +83,24 @@ rule create_index_bowtie:
     threads: config["build_index_bowtie"]["threads"]
     wrapper:
         "v4.3.0/bio/bowtie2/build"
+
+
+rule create_index_star:
+    input:
+        fasta="resources/reference/genome.fasta",
+        gtf="resources/reference/annotation.gtf",
+    output:
+        directory("resources/reference/star/index/"),
+    message:
+        "Testing STAR index"
+    threads: config["build_index_star"]["threads"]
+    params:
+        sjdb_overhang=config["build_index_star"]["sjdb_overhang"],
+        extra="",
+    log:
+        "results/logs/build_index_star/build_star_index.log",
+    wrapper:
+        "v4.3.0/bio/star/index"
 
 
 rule create_index_kallisto:
