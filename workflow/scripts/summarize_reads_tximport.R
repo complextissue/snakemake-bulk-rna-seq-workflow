@@ -18,7 +18,7 @@ tx_out <- snakemake@params[["counts_from_abundance"]] %in% c(
 )
 
 dropInfReps <- !snakemake@params[["inferential_replicates"]]
-if (dropInfReps) {
+if (!dropInfReps) {
     infRepStat <- rowMedians
     varReduce <- TRUE
 } else {

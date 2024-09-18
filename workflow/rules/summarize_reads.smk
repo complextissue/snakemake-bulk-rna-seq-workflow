@@ -49,7 +49,7 @@ rule run_pytximport_rsem_gene:
         counts="resources/reads/summarized_pytximport/counts_rsem_gene.{output_format}",
     params:
         data_type="rsem",
-        gene_level=False,
+        gene_level=True,
         inferential_replicates=False,
         counts_from_abundance="None",
     conda:
@@ -90,7 +90,7 @@ rule run_tximport_salmon:
     params:
         data_type="salmon",
         gene_level=False,
-        inferential_replicates=False,
+        inferential_replicates=True,
         counts_from_abundance="{counts_from_abundance_tximport}",
     conda:
         "../envs/summarize_reads_tximport.yaml"
