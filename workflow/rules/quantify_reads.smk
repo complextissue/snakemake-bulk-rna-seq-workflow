@@ -3,7 +3,7 @@ rule quantify_reads_salmon:
         r1="resources/reads/trimmed/{sample_id}_1.fastq.gz",
         r2="resources/reads/trimmed/{sample_id}_2.fastq.gz",
         index=multiext(
-            "resources/reference/transcriptome_index/",
+            "resources/reference/salmon/",
             "complete_ref_lens.bin",
             "ctable.bin",
             "ctg_offsets.bin",
@@ -35,11 +35,12 @@ rule quantify_reads_salmon:
         "v4.3.0/bio/salmon/quant"
 
 
-rule quantify_reads_bowtie:
+rule quantify_reads_rsem:
     input:
-        sample=["resources/reads/trimmed/{sample_id}_1.fastq.gz", "resources/reads/trimmed/{sample_id}_2.fastq.gz"],
-        idx=multiext(
-            "resources/reference/bowtie/genome",
+        fq1="resources/reads/trimmed/{sample_id}_1.fastq.gz",
+        fq2="resources/reads/trimmed/{sample_id}_2.fastq.gz",
+        bowtie2_reference=multiext(
+            "resources/reference/rsem/reference",
             ".1.bt2",
             ".2.bt2",
             ".3.bt2",
@@ -48,78 +49,21 @@ rule quantify_reads_bowtie:
             ".rev.2.bt2",
         ),
     output:
-        "resources/reads/quantified_bowtie/{sample_id}.bam",
-    log:
-        "results/logs/quantify_reads_bowtie/{sample_id}.log",
-    params:
-        extra="",
-    threads: config["quantify_reads_bowtie"]["threads"]
-    wrapper:
-        "v4.3.0/bio/bowtie2/align"
-
-
-rule quantify_reads_rsem:
-    input:
-        bam="resources/reads/quantified_bowtie/{sample_id}.bam",
-        reference=multiext(
-            "resources/reference/rsem/reference", ".grp", ".ti", ".transcripts.fa", ".seq", ".idx.fa", ".n2g.idx.fa"
-        ),
-    output:
         genes_results="resources/reads/quantified_rsem/{sample_id}.genes.results",
         isoforms_results="resources/reads/quantified_rsem/{sample_id}.isoforms.results",
     log:
         "results/logs/quantify_reads_rsem/{sample_id}.log",
     params:
-        paired_end=True,
-        extra="--seed 42",
+        output_prefix="resources/reads/quantified_rsem/{sample_id}",
+        reference="resources/reference/rsem/reference",
+        extra="--seed 42 --estimate-rspd",
     threads: config["quantify_reads_rsem"]["threads"]
-    wrapper:
-        "v4.3.0/bio/rsem/calculate-expression"
-
-
-rule quantify_reads_star:
-    input:
-        fq1="resources/reads/{accession}_1.fastq.gz",
-        fq2="resources/reads/{accession}_2.fastq.gz",
-        idx="resources/reference/star/index/",
-    output:
-        output_path="resources/reads/quantified_star/{accession}/",
-        aln="resources/reads/quantified_star/{accession}/aligned.bam",
-        aln_transcriptome="resources/reads/quantified_star/{accession}/Aligned.toTranscriptome.out.bam",
-    log:
-        "results/logs/quantify_reads_star/{accession}.log",
-    params:
-        extra=(
-            "--outSAMtype BAM Unsorted "
-            "--quantMode TranscriptomeSAM GeneCounts "
-            "--outFilterScoreMin 30 "
-            "--outFilterMultimapNmax 10 --winAnchorMultimapNmax 50 "
-            "--alignEndsType Local "
-        ),
-    threads: config["quantify_reads_star"]["threads"]
     conda:
-        "../envs/quantify_reads_star.yaml"
-    script:
-        "../scripts/quantify_reads_star.py"
-
-
-rule quantify_reads_rsem_star:
-    input:
-        bam="resources/reads/quantified_star/{sample_id}/Aligned.toTranscriptome.out.bam",
-        reference=multiext(
-            "resources/reference/rsem/reference", ".grp", ".ti", ".transcripts.fa", ".seq", ".idx.fa", ".n2g.idx.fa"
-        ),
-    output:
-        genes_results="resources/reads/quantified_rsem_star/{sample_id}.genes.results",
-        isoforms_results="resources/reads/quantified_rsem_star/{sample_id}.isoforms.results",
-    log:
-        "results/logs/quantify_reads_rsem_star/{sample_id}.log",
-    params:
-        paired_end=True,
-        extra="--seed 42",
-    threads: config["quantify_reads_rsem"]["threads"]
-    wrapper:
-        "v4.3.0/bio/rsem/calculate-expression"
+        "../envs/rsem.yaml"
+    shell:
+        """
+        rsem-calculate-expression --paired-end --bowtie2 --num-threads {threads} {params.extra} {input.fq1} {input.fq2} {params.reference} {params.output_prefix} > {log}
+        """
 
 
 rule quantify_reads_kallisto:

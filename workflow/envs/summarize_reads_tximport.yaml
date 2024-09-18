@@ -7,4 +7,5 @@ dependencies:
   - r::r-essentials = 4.3.1
   - conda-forge::r-matrixstats = 1.4.1
   - bioconda::bioconductor-tximport = 1.30.0
+  - bioconda::bioconductor-rhdf5 = 2.46.1
   - conda-forge::r-readr = 2.1.5

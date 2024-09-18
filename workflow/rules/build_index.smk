@@ -18,7 +18,7 @@ rule create_index_salmon:
         decoys="resources/reference/decoys.txt",
     output:
         multiext(
-            "resources/reference/transcriptome_index/",
+            "resources/reference/salmon/",
             "complete_ref_lens.bin",
             "ctable.bin",
             "ctg_offsets.bin",
@@ -48,59 +48,25 @@ rule create_index_rsem:
     input:
         reference_genome="resources/reference/genome.fasta",
     output:
+        reference_name=directory("resources/reference/rsem/"),
         seq="resources/reference/rsem/reference.seq",
         grp="resources/reference/rsem/reference.grp",
         ti="resources/reference/rsem/reference.ti",
         other_1="resources/reference/rsem/reference.transcripts.fa",
         other_2="resources/reference/rsem/reference.idx.fa",
         other_3="resources/reference/rsem/reference.n2g.idx.fa",
+        other_4="resources/reference/rsem/reference.chrlist",
     params:
-        extra="--gtf resources/reference/rsem/annotations.gtf",
+        extra="--gtf resources/reference/annotation.gtf",
     log:
         "results/logs/build_index/create_index_rsem.log",
+    conda:
+        "../envs/rsem.yaml"
     threads: config["build_index_rsem"]["threads"]
-    wrapper:
-        "v4.3.0/bio/rsem/prepare-reference"
-
-
-rule create_index_bowtie:
-    input:
-        ref="resources/reference/genome.fasta",
-    output:
-        multiext(
-            "resources/reference/bowtie/genome",
-            ".1.bt2",
-            ".2.bt2",
-            ".3.bt2",
-            ".4.bt2",
-            ".rev.1.bt2",
-            ".rev.2.bt2",
-        ),
-    params:
-        extra="",
-    log:
-        "results/logs/build_index/create_index_bowtie.log",
-    threads: config["build_index_bowtie"]["threads"]
-    wrapper:
-        "v4.3.0/bio/bowtie2/build"
-
-
-rule create_index_star:
-    input:
-        fasta="resources/reference/genome.fasta",
-        gtf="resources/reference/annotation.gtf",
-    output:
-        directory("resources/reference/star/index/"),
-    message:
-        "Testing STAR index"
-    threads: config["build_index_star"]["threads"]
-    params:
-        sjdb_overhang=config["build_index_star"]["sjdb_overhang"],
-        extra="",
-    log:
-        "results/logs/build_index_star/build_star_index.log",
-    wrapper:
-        "v4.3.0/bio/star/index"
+    shell:
+        """
+        rsem-prepare-reference --bowtie2 --num-threads {threads} {params.extra} {input.reference_genome} {output.reference_name} > {log}
+        """
 
 
 rule create_index_kallisto:

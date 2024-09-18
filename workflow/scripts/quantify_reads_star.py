@@ -3,6 +3,7 @@ __copyright__ = "Copyright 2016, Johannes Köster"
 __email__ = "koester@jimmy.harvard.edu"
 __license__ = "MIT"
 
+import os
 from snakemake.script import snakemake
 from snakemake.shell import shell
 
@@ -30,10 +31,6 @@ elif fq1[0].endswith(".bz2"):
 else:
     readcmd = ""
 
-out_unmapped = snakemake.output.get("unmapped", "")
-if out_unmapped:
-    out_unmapped = "--outReadsUnmapped Fastx"
-
 index = snakemake.input.get("idx")
 if not index:
     index = snakemake.params.get("idx", "")
@@ -46,6 +43,10 @@ elif "BAM Unsorted" in extra:
 else:
     stdout = "SAM"
 
+# Remove the temporary directory if it exists
+if os.path.exists(f"{snakemake.output.output_path}/STARtmp"):
+    shell("rm -rf {snakemake.output.output_path}/STARtmp")
+
 shell(
     "STAR "
     " --runThreadN {snakemake.threads}"
@@ -53,9 +54,6 @@ shell(
     " --readFilesIn {input_str}"
     " {readcmd}"
     " {extra}"
-    " {out_unmapped}"
     " --outTmpDir {snakemake.output.output_path}/STARtmp"
     " --outFileNamePrefix {snakemake.output.output_path}/"
-    " --outStd {stdout}"
-    " > {snakemake.output.aln}"
 )

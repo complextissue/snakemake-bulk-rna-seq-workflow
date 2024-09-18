@@ -3,5 +3,6 @@ channels:
   - bioconda
 dependencies:
   - conda-forge::numpy = 2.0.0
-  - conda-forge::pip = 24.0.0
-  - bioconda::pytximport = 0.8.0
+  - conda-forge::pip = 24.2.0
+  - pip:
+    - git+https://github.com/complextissue/pytximport.git@dev

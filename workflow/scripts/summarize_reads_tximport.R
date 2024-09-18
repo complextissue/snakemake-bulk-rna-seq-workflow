@@ -17,14 +17,25 @@ tx_out <- snakemake@params[["counts_from_abundance"]] %in% c(
     "dtuScaledTPM"
 )
 
+dropInfReps <- !snakemake@params[["inferential_replicates"]]
+if (dropInfReps) {
+    infRepStat <- rowMedians
+    varReduce <- TRUE
+} else {
+    infRepStat <- NULL
+    varReduce <- FALSE
+}
+
 txi <- tximport(
     files,
-    type = "salmon",
+    type = snakemake@params[["data_type"]],
     txOut = tx_out,
+    txIn = !snakemake@params[["gene_level"]],
     tx2gene = tx2gene,
     countsFromAbundance = snakemake@params[["counts_from_abundance"]],
-    dropInfReps = FALSE,
-    infRepStat = rowMedians,
+    dropInfReps = dropInfReps,
+    infRepStat = infRepStat,
+    varReduce = varReduce,
     ignoreTxVersion = TRUE,
     ignoreAfterBar = TRUE
 )

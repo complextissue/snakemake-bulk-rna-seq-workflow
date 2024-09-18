@@ -7,57 +7,40 @@ experiment:
   treated_name: "treated"
 
 check_quality:
-  run: True
-  threads: 5
+  run: False
+  threads: 7
   memory_limit_mb: 4096 # FastQC requires this to be at least 100 MB
 
 get_reference:
-  run: True
+  run: False
   species: "mus_musculus" # "homo_sapiens"
   build: "GRCm39" # "GRCh38"
   release: "112" # "112"
 
 build_index_salmon:
-  run: True
-  threads: 5
+  run: False
+  threads: 7
 
 build_index_kallisto:
-  run: True
-  threads: 5
+  run: False
+  threads: 7
 
 build_index_rsem:
   run: False
-  threads: 5
-
-build_index_bowtie:
-  run: True
-  threads: 5
-
-build_index_star:
-  run: True
-  threads: 5
-  sjdb_overhang: 149
+  threads: 7
 
 quantify_reads_salmon:
-  run: True
+  run: False
   threads: 7
   libtype: "A"
   extra: "--numBootstraps 48 --gcBias"
 
 quantify_reads_kallisto:
-  run: True
-  threads: 7
-
-quantify_reads_bowtie:
-  run: True
+  run: False
   threads: 7
 
 quantify_reads_rsem:
   run: False
-  threads: 7
-
-quantify_reads_star:
-  run: True
   threads: 7
 
 summarize_reads:
@@ -72,7 +55,7 @@ perform_dge_analysis:
   run: False
   threads: 8
   min_mean_counts: 20 # the minimum mean count across all samples
-  min_max_counts: 50 # the minimum count that at least one sample needs to have
+  min_max_counts: 70 # the minimum count that at least one sample needs to have
   min_sample_counts: # the minimum count min_counts that at least min_samples have to have
     min_counts: 20
     min_samples: 2

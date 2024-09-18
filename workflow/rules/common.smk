@@ -66,7 +66,7 @@ def all_input(wildcards):
             [
                 "resources/reference/gentrome.fasta",
                 "resources/reference/decoys.txt",
-                "resources/reference/transcriptome_index/info.json",
+                "resources/reference/salmon/info.json",
                 "results/logs/build_index/create_decoys_salmon.log",
                 "results/logs/build_index/create_index_salmon.log",
             ]
@@ -80,20 +80,13 @@ def all_input(wildcards):
             ]
         )
 
-    if config["build_index_star"]["run"]:
-        wanted_input.extend(
-            [
-                directory("resources/reference/star/index/"),
-            ]
-        )
-
     if config["build_index_rsem"]["run"]:
         wanted_input.extend(
             [
+                directory("resources/reference/rsem/"),
                 "resources/reference/rsem/reference.seq",
-                "results/logs/build_index/create_index_rsem.log",
                 *multiext(
-                    "resources/reference/bowtie/genome",
+                    "resources/reference/rsem/reference",
                     ".1.bt2",
                     ".2.bt2",
                     ".3.bt2",
@@ -101,7 +94,7 @@ def all_input(wildcards):
                     ".rev.1.bt2",
                     ".rev.2.bt2",
                 ),
-                "results/logs/build_index/create_index_bowtie.log",
+                "results/logs/build_index/create_index_rsem.log",
             ]
         )
 
@@ -149,22 +142,14 @@ def all_input(wildcards):
             )
         )
 
-    if config["quantify_reads_star"]["run"]:
-        wanted_input.extend(
-            expand(
-                [
-                    "resources/reads/quantified_star/{sample_id}/Aligned.toTranscriptome.out.bam",
-                    "results/logs/quantify_reads_star/{sample_id}.log",
-                ],
-                sample_id=samples.index,
-            )
-        )
-
     if config["summarize_reads"]["run"]:
         wanted_input.extend(
             expand(
                 [
-                    "resources/reads/summarized_pytximport/counts_{counts_from_abundance_pytximport}.{output_format}",
+                    "resources/reads/summarized_pytximport/counts_salmon_{counts_from_abundance_pytximport}.{output_format}",
+                    "resources/reads/summarized_pytximport/counts_rsem_transcript_{counts_from_abundance_pytximport}.{output_format}",
+                    "resources/reads/summarized_pytximport/counts_rsem_gene.{output_format}",
+                    "resources/reads/summarized_pytximport/counts_kallisto_{counts_from_abundance_pytximport}.{output_format}",
                 ],
                 counts_from_abundance_pytximport=counts_from_abundances_pytximport,
                 output_format=output_formats,
@@ -175,7 +160,10 @@ def all_input(wildcards):
         wanted_input.extend(
             expand(
                 [
-                    "resources/reads/summarized_tximport/counts_{counts_from_abundance_tximport}.csv",
+                    "resources/reads/summarized_tximport/counts_salmon_{counts_from_abundance_tximport}.csv",
+                    "resources/reads/summarized_tximport/counts_kallisto_{counts_from_abundance_tximport}.csv",
+                    "resources/reads/summarized_tximport/counts_rsem_transcript_{counts_from_abundance_tximport}.csv",
+                    "resources/reads/summarized_tximport/counts_rsem_gene.csv",
                 ],
                 counts_from_abundance_tximport=counts_from_abundances_tximport,
             )
