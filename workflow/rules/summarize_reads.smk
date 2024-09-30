@@ -12,6 +12,7 @@ rule run_pytximport_salmon:
         gene_level=False,
         inferential_replicates=True,
         counts_from_abundance="{counts_from_abundance_pytximport}",
+    threads: config["summarize_reads"]["threads"]
     conda:
         "../envs/summarize_reads.yaml"
     script:
@@ -32,6 +33,7 @@ rule run_pytximport_rsem_transcript:
         gene_level=False,
         inferential_replicates=False,
         counts_from_abundance="{counts_from_abundance_pytximport}",
+    threads: config["summarize_reads"]["threads"]
     conda:
         "../envs/summarize_reads.yaml"
     script:
@@ -52,6 +54,7 @@ rule run_pytximport_rsem_gene:
         gene_level=True,
         inferential_replicates=False,
         counts_from_abundance="None",
+    threads: config["summarize_reads"]["threads"]
     conda:
         "../envs/summarize_reads.yaml"
     script:
@@ -72,6 +75,7 @@ rule run_pytximport_kallisto:
         gene_level=False,
         inferential_replicates=False,
         counts_from_abundance="{counts_from_abundance_pytximport}",
+    threads: config["summarize_reads"]["threads"]
     conda:
         "../envs/summarize_reads.yaml"
     script:
@@ -92,6 +96,7 @@ rule run_tximport_salmon:
         gene_level=False,
         inferential_replicates=True,
         counts_from_abundance="{counts_from_abundance_tximport}",
+    threads: config["summarize_reads_tximport"]["threads"]
     conda:
         "../envs/summarize_reads_tximport.yaml"
     script:
@@ -112,6 +117,7 @@ rule run_tximport_kallisto:
         gene_level=False,
         inferential_replicates=False,
         counts_from_abundance="{counts_from_abundance_tximport}",
+    threads: config["summarize_reads_tximport"]["threads"]
     conda:
         "../envs/summarize_reads_tximport.yaml"
     script:
@@ -132,6 +138,7 @@ rule run_tximport_rsem_transcript:
         gene_level=False,
         inferential_replicates=False,
         counts_from_abundance="{counts_from_abundance_tximport}",
+    threads: config["summarize_reads_tximport"]["threads"]
     conda:
         "../envs/summarize_reads_tximport.yaml"
     script:
@@ -152,6 +159,7 @@ rule run_tximport_rsem_gene:
         gene_level=True,
         inferential_replicates=False,
         counts_from_abundance="no",
+    threads: config["summarize_reads_tximport"]["threads"]
     conda:
         "../envs/summarize_reads_tximport.yaml"
     script:

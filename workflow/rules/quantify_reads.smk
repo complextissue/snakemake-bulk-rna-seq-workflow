@@ -73,7 +73,7 @@ rule quantify_reads_kallisto:
     output:
         directory("resources/reads/quantified_kallisto/{sample_id}"),
     params:
-        extra="",
+        extra=config["quantify_reads_kallisto"]["extra"],
     log:
         "results/logs/quantify_reads_kallisto/{sample_id}.log",
     threads: config["quantify_reads_kallisto"]["threads"]

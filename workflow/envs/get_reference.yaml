@@ -1,4 +1,4 @@
 channels:
   - bioconda
 dependencies:
-  - bioconda::pytximport = 0.8.0
+  - bioconda::pytximport = 0.9.0

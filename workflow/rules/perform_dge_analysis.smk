@@ -1,6 +1,6 @@
 rule run_pydeseq2:
     input:
-        counts="resources/reads/summarized/counts.h5ad",
+        counts="resources/reads/summarized_pytximport/counts_salmon_length_scaled_tpm.h5ad",
         sample_table="config/samples.tsv",
         transcript_to_gene_map="resources/reference/transcript_to_gene_map.tsv",
     output:

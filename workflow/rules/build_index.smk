@@ -56,6 +56,15 @@ rule create_index_rsem:
         other_2="resources/reference/rsem/reference.idx.fa",
         other_3="resources/reference/rsem/reference.n2g.idx.fa",
         other_4="resources/reference/rsem/reference.chrlist",
+        bowtie2_reference=multiext(
+            "resources/reference/rsem/reference",
+            ".1.bt2",
+            ".2.bt2",
+            ".3.bt2",
+            ".4.bt2",
+            ".rev.1.bt2",
+            ".rev.2.bt2",
+        ),
     params:
         extra="--gtf resources/reference/annotation.gtf",
     log:
@@ -65,7 +74,7 @@ rule create_index_rsem:
     threads: config["build_index_rsem"]["threads"]
     shell:
         """
-        rsem-prepare-reference --bowtie2 --num-threads {threads} {params.extra} {input.reference_genome} {output.reference_name} > {log}
+        rsem-prepare-reference --bowtie2 --num-threads {threads} {params.extra} {input.reference_genome} {output.reference_name}/reference > {log}
         """
 
 
