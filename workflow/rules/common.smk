@@ -158,14 +158,21 @@ def all_input(wildcards):
         )
 
     if config["perform_gse_analysis"]["run"]:
+        # Base outputs (constant, not dependent on geneset)
+        wanted_input.extend(
+            [
+                "results/plots/perform_dge_analysis/volcano_plot_base.svg",
+                "results/plots/perform_gse_analysis/collectri_barplot_base.svg",
+                "results/tables/perform_gse_analysis/collectri_base.csv",
+                "results/plots/perform_gse_analysis/progeny_barplot_base.svg",
+                "results/tables/perform_gse_analysis/progeny_base.csv",
+            ]
+        )
+
+        # Geneset-specific outputs (variable, depend on msigdb_geneset)
         wanted_input.extend(
             expand(
                 [
-                    "results/plots/perform_dge_analysis/volcano_plot_{msigdb_geneset}.svg",
-                    "results/plots/perform_gse_analysis/collectri_barplot_{msigdb_geneset}.svg",
-                    "results/tables/perform_gse_analysis/collectri_{msigdb_geneset}.csv",
-                    "results/plots/perform_gse_analysis/progeny_barplot_{msigdb_geneset}.svg",
-                    "results/tables/perform_gse_analysis/progeny_{msigdb_geneset}.csv",
                     "results/plots/perform_gse_analysis/{msigdb_geneset}_dotplot.svg",
                     "results/tables/perform_gse_analysis/{msigdb_geneset}.csv",
                 ],
