@@ -1,0 +1,20 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+description: |
+  Schema for sample metadata
+
+properties:
+  sample_id:
+    type: string
+    description: Unique identifier for the sample (SRR Run ID)
+    pattern: "^SRR[0-9]+$"
+  patient_id:
+    type: string
+    description: Patient identifier for paired samples
+  condition:
+    type: string
+    description: Disease state of the sample (e.g., primary vs recurrent)
+
+required:
+  - sample_id
+  - condition

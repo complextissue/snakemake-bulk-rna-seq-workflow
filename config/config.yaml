@@ -1,0 +1,77 @@
+samples: "config/metadata.csv"
+
+# general settings
+experiment:
+  species: "human"
+  # Condition names for differential expression analysis
+  # These should match the values in the 'condition' column of metadata.csv
+  untreated_name: "primary"  # Control/baseline condition (e.g., primary tumor)
+  treated_name: "recurrent"  # Treatment/comparison condition (e.g., recurrent tumor)
+  paired: True # Set to True for paired-end reads, False for single-end
+
+check_quality:
+  run: True
+  run_fastqc: False  # Whether to run FastQC quality checks
+  threads: 4
+  memory_limit_mb: 4096 # FastQC requires this to be at least 100 MB
+  fastp:
+    qualified_quality_phred: 20  # Q20 - bases with quality >= Q20 are qualified
+    unqualified_percent_limit: 25  # Allow max 25% of bases to be unqualified
+    n_base_limit: 5  # Discard reads with more than 5 N bases
+    average_qual: 0
+    length_required: 30  # Minimum read length after trimming
+    length_limit: 0  # No maximum length limit (0 = disabled)
+    detect_adapter: True
+    trim_poly_g: False # Not needed for non-NextSeq data
+    poly_g_min_len: 10
+    cut_tail: True  # Trim low quality bases from 3' end
+    cut_tail_window_size: 4
+    cut_tail_mean_quality: 20
+    cut_front: True  # Trim low quality bases from 5' end
+    cut_front_window_size: 4
+    cut_front_mean_quality: 20
+    low_complexity_filter: False
+    complexity_threshold: 30  # Require 30% complexity
+    overrepresentation_analysis: True
+
+get_reference:
+  run: True
+  species: "homo_sapiens"
+  build: "GRCh38"
+  release: "115"
+
+build_index_salmon:
+  run: True
+  threads: 30
+
+quantify_reads_salmon:
+  run: True
+  threads: 10
+  libtype: "A" # A for automated
+  extra: "--numBootstraps 48 --gcBias"
+
+summarize_reads:
+  run: True
+  threads: 10
+
+perform_dge_analysis:
+  run: True
+  threads: 8
+  min_mean_counts: 20 # the minimum mean count across all samples
+  min_max_counts: 70 # the minimum count that at least one sample needs to have
+  min_sample_counts: # the minimum count min_counts that at least min_samples have to have
+    min_counts: 20
+    min_samples: 2
+  refit_cooks: True
+  shrink_log2_fold_change: True
+
+perform_gse_analysis:
+  run: True
+  significance_threshold: 0.01 # 0.05
+  log2_fold_change_threshold: 0.5
+  top_genes: 100 # how many genes to annotate in the volcano plot
+  top_transcription_factors: 25 # how many transcription factors to show in the plot
+  pathway_overlap_count: 5 # how many genes of the pathway gene set have to be present in the DGE results
+  top_pathways: 20 # how many pathways to show in the plot
+  msigdb_geneset: ["hallmark", "kegg_pathways", "go_biological_process", "reactome_pathways"]
+  top_genesets: 15 # how many genesets to show in the plot
