@@ -29,14 +29,21 @@ else:
 
 ad_counts.obs["condition"] = conditions
 ad_counts.obs["sample_id"] = samples.index
-ad_counts.obs["patient_id"] = samples["patient_id"].values
-ad_counts.obs["center"] = samples["center"].values
+
+# Only add patient_id if the column exists
+has_patient_id = "patient_id" in samples.columns
+if has_patient_id:
+    ad_counts.obs["patient_id"] = samples["patient_id"].values
+
+# Only add center if the column exists
+if "center" in samples.columns:
+    ad_counts.obs["center"] = samples["center"].values
 
 # Filter outlier samples and outlier patients out based on snakemake.params
 if snakemake.params.get("filter_outlier_samples", False):
     outlier_samples = snakemake.params["outlier_samples"]
     ad_counts = ad_counts[~ad_counts.obs["sample_id"].isin(outlier_samples)].copy()
-if snakemake.params.get("filter_outlier_patients", False):
+if has_patient_id and snakemake.params.get("filter_outlier_patients", False):
     outlier_patients = snakemake.params["outlier_patients"]
     ad_counts = ad_counts[~ad_counts.obs["patient_id"].isin(outlier_patients)].copy()
 
@@ -93,9 +100,22 @@ if snakemake.params["min_sample_counts"]:
         ),
     ].copy()
 
+# Determine the appropriate design formula
+# Check if patient_id exists and if there are multiple samples per patient
+if has_patient_id:
+    samples_per_patient = ad_counts.obs["patient_id"].value_counts()
+    has_multiple_samples_per_patient = (samples_per_patient > 1).any()
+
+    if has_multiple_samples_per_patient:
+        design_formula = "~ patient_id + condition"
+    else:
+        design_formula = "~ condition"
+else:
+    design_formula = "~ condition"
+
 dds = DeseqDataSet(
     adata=ad_counts,
-    design="~ patient_id + condition",
+    design=design_formula,
     refit_cooks=snakemake.params["refit_cooks"],
     inference=DefaultInference(n_cpus=min(snakemake.threads, len(ad_counts))),
     quiet=True,

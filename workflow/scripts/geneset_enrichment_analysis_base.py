@@ -64,7 +64,9 @@ plt.close(fig)
 # perform transcription factor enrichment analysis
 collectri = pd.read_csv(snakemake.input["collectri"], index_col=0)
 
-treated_vs_untreated_identifier = f"{snakemake.params['treated_name']}.vs.{snakemake.params['untreated_name']}"
+treated_vs_untreated_identifier = (
+    f"{snakemake.params['treated_name']}.vs.{snakemake.params['untreated_name']}"
+)
 
 mat = df_results[["stat"]].T.rename(
     index={"stat": treated_vs_untreated_identifier},
@@ -76,6 +78,9 @@ tf_acts, tf_pvals = dc.mt.ulm(
     verbose=True,
     tmin=10,
 )
+msk = (tf_pvals.T < 0.05).iloc[:, 0]
+tf_acts = tf_acts.loc[:, msk]
+tf_pvals = tf_pvals.loc[:, msk]
 
 fig = dc.pl.barplot(
     data=tf_acts,
@@ -126,6 +131,24 @@ for top_tf in top_tfs:
     fig.savefig(volcano_file, dpi=500, bbox_inches="tight")
     plt.close(fig)
 
+    # Source-target scatter plot showing log2FC vs stat for TF targets
+    try:
+        fig = dc.pl.source_targets(
+            data=df_results,
+            net=collectri,
+            x="weight",
+            y="stat",
+            name=top_tf,
+            top=20,
+            figsize=(10, 7.5),
+            return_fig=True,
+        )
+        source_target_file = tf_plots_dir / f"{top_tf}_source_targets.svg"
+        fig.savefig(source_target_file, dpi=500, bbox_inches="tight")
+        plt.close(fig)
+    except Exception as e:
+        warning(f"Could not create source-target plot for {top_tf}: {e}")
+
 # perform pathway enrichment analysis
 progeny = pd.read_csv(snakemake.input["progeny"], index_col=0)
 pathway_acts, pathway_pvals = dc.mt.ulm(
@@ -133,6 +156,9 @@ pathway_acts, pathway_pvals = dc.mt.ulm(
     net=progeny,
     tmin=snakemake.params["pathway_overlap_count"],
 )
+msk = (pathway_pvals.T < 0.05).iloc[:, 0]
+pathway_acts = pathway_acts.loc[:, msk]
+pathway_pvals = pathway_pvals.loc[:, msk]
 
 fig = dc.pl.barplot(
     data=pathway_acts,
@@ -162,52 +188,47 @@ top_pathways = (
 pathways_plots_dir = pathways_barplot_path.parent
 
 for top_pathway in top_pathways:
-    # Get positive and negative edges if they exist
-    pos_net = progeny[(progeny["source"] == top_pathway) & (progeny["weight"] > 0)]
-    neg_net = progeny[(progeny["source"] == top_pathway) & (progeny["weight"] < 0)]
+    pathway_net = progeny[progeny["source"] == top_pathway]
 
-    # Create leading edge plots for positive and negative components
-    if len(pos_net) > 0:
+    if len(pathway_net) > 0:
+        # Leading edge plot
         try:
-            _, pos_le = dc.pl.leading_edge(
+            _, le = dc.pl.leading_edge(
                 df_results,
                 stat="stat",
-                net=pos_net,
+                net=pathway_net,
                 name=top_pathway,
                 figsize=(10, 5),
                 return_fig=True,
             )
             plt.savefig(
-                pathways_plots_dir / f"{top_pathway}_positive_leading_edge.svg",
+                pathways_plots_dir / f"{top_pathway}_leading_edge.svg",
                 dpi=500,
                 bbox_inches="tight",
             )
             plt.close()
         except Exception as e:
-            warning(
-                f"Could not create positive leading edge plot for {top_pathway}: {e}"
-            )
+            warning(f"Could not create leading edge plot for {top_pathway}: {e}")
 
-    if len(neg_net) > 0:
+        # Source-target scatter plot showing log2FC vs stat for pathway targets
         try:
-            _, neg_le = dc.pl.leading_edge(
-                df_results,
-                stat="stat",
-                net=neg_net,
+            fig = dc.pl.source_targets(
+                data=df_results,
+                net=pathway_net,
+                x="weight",
+                y="stat",
                 name=top_pathway,
-                figsize=(10, 5),
+                top=20,
+                figsize=(10, 7.5),
                 return_fig=True,
             )
-            plt.savefig(
-                pathways_plots_dir / f"{top_pathway}_negative_leading_edge.svg",
-                dpi=500,
-                bbox_inches="tight",
+            source_target_file = (
+                pathways_plots_dir / f"{top_pathway}_source_targets.svg"
             )
-            plt.close()
+            fig.savefig(source_target_file, dpi=500, bbox_inches="tight")
+            plt.close(fig)
         except Exception as e:
-            warning(
-                f"Could not create negative leading edge plot for {top_pathway}: {e}"
-            )
+            warning(f"Could not create source-target plot for {top_pathway}: {e}")
 
 # Save processed df_results for downstream geneset analysis
 df_results.to_csv(snakemake.output["processed_results"])
