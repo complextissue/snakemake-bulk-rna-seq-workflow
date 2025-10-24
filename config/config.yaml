@@ -64,6 +64,8 @@ perform_dge_analysis:
     min_samples: 2
   refit_cooks: True
   shrink_log2_fold_change: True
+  filter_outlier_patients: True
+  outlier_patients: ["SMC_P6", "SMC_P17"]
 
 perform_gse_analysis:
   run: True
@@ -72,6 +74,6 @@ perform_gse_analysis:
   top_genes: 100 # how many genes to annotate in the volcano plot
   top_transcription_factors: 25 # how many transcription factors to show in the plot
   pathway_overlap_count: 5 # how many genes of the pathway gene set have to be present in the DGE results
-  top_pathways: 20 # how many pathways to show in the plot
+  top_pathways: 25 # how many pathways to show in the plot
   msigdb_geneset: ["hallmark", "kegg_pathways", "go_biological_process", "reactome_pathways"]
-  top_genesets: 15 # how many genesets to show in the plot
+  top_genesets: 25 # how many genesets to show in the plot

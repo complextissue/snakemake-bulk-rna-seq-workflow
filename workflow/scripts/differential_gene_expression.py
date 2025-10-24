@@ -15,7 +15,7 @@ from snakemake.script import snakemake
 
 count_path = Path(snakemake.input["counts"])
 samples = pd.read_csv(snakemake.input["sample_table"], index_col=0)
-conditions = [samples.loc[sample_id, "condition"] for sample_id in samples.index]
+conditions = samples["condition"].values
 
 if count_path.suffix == ".h5ad":
     ad_counts = ad.read_h5ad(count_path)
@@ -28,6 +28,17 @@ else:
     raise ValueError(f"Unknown file format: {count_path.suffix}")
 
 ad_counts.obs["condition"] = conditions
+ad_counts.obs["sample_id"] = samples.index
+ad_counts.obs["patient_id"] = samples["patient_id"].values
+ad_counts.obs["center"] = samples["center"].values
+
+# Filter outlier samples and outlier patients out based on snakemake.params
+if snakemake.params.get("filter_outlier_samples", False):
+    outlier_samples = snakemake.params["outlier_samples"]
+    ad_counts = ad_counts[~ad_counts.obs["sample_id"].isin(outlier_samples)].copy()
+if snakemake.params.get("filter_outlier_patients", False):
+    outlier_patients = snakemake.params["outlier_patients"]
+    ad_counts = ad_counts[~ad_counts.obs["patient_id"].isin(outlier_patients)].copy()
 
 # plot a PCA to check whether the samples cluster by condition
 pca = PCA(n_components=2, svd_solver="full")
@@ -84,9 +95,9 @@ if snakemake.params["min_sample_counts"]:
 
 dds = DeseqDataSet(
     adata=ad_counts,
-    design="~condition",
+    design="~ patient_id + condition",
     refit_cooks=snakemake.params["refit_cooks"],
-    inference=DefaultInference(n_cpus=snakemake.threads),
+    inference=DefaultInference(n_cpus=min(snakemake.threads, len(ad_counts))),
     quiet=True,
 )
 

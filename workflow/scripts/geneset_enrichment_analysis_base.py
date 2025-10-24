@@ -64,9 +64,7 @@ plt.close(fig)
 # perform transcription factor enrichment analysis
 collectri = pd.read_csv(snakemake.input["collectri"], index_col=0)
 
-treated_vs_untreated_identifier = (
-    f"{snakemake.params['treated_name']}.vs.{snakemake.params['untreated_name']}"
-)
+treated_vs_untreated_identifier = f"{snakemake.params['treated_name']}.vs.{snakemake.params['untreated_name']}"
 
 mat = df_results[["stat"]].T.rename(
     index={"stat": treated_vs_untreated_identifier},
@@ -130,7 +128,7 @@ for top_tf in top_tfs:
 
 # perform pathway enrichment analysis
 progeny = pd.read_csv(snakemake.input["progeny"], index_col=0)
-pathway_acts, pathway_pvals = dc.mt.mlm(
+pathway_acts, pathway_pvals = dc.mt.ulm(
     data=mat,
     net=progeny,
     tmin=snakemake.params["pathway_overlap_count"],

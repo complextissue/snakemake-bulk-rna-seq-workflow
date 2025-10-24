@@ -53,6 +53,8 @@ rule run_decoupler_genesets:
         msigdb_geneset="|".join(config["perform_gse_analysis"]["msigdb_geneset"]),
     params:
         species=config["experiment"]["species"],
+        treated_name=config["experiment"]["treated_name"],
+        untreated_name=config["experiment"]["untreated_name"],
         significance_threshold=config["perform_gse_analysis"]["significance_threshold"],
         msigdb_geneset="{msigdb_geneset}",
         top_genesets=config["perform_gse_analysis"]["top_genesets"],

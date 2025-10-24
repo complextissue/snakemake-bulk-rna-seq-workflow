@@ -11,6 +11,10 @@ rule run_pydeseq2:
     params:
         treated_name=config["experiment"]["treated_name"],
         untreated_name=config["experiment"]["untreated_name"],
+        filter_outlier_patients=config["perform_dge_analysis"][
+            "filter_outlier_patients"
+        ],
+        outlier_patients=config["perform_dge_analysis"]["outlier_patients"],
         min_mean_counts=config["perform_dge_analysis"]["min_mean_counts"],
         min_max_counts=config["perform_dge_analysis"]["min_max_counts"],
         min_sample_counts=config["perform_dge_analysis"]["min_sample_counts"],

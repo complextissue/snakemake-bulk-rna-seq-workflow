@@ -11,6 +11,9 @@ properties:
   patient_id:
     type: string
     description: Patient identifier for paired samples
+  center:
+    type: string
+    description: Center where the sample was acquired
   condition:
     type: string
     description: Disease state of the sample (e.g., primary vs recurrent)
